@@ -1,13 +1,17 @@
 alter table ciclista
 rename column fecha_nacimiento to fecha_nac;
 
+drop table if exists ciclista;
+drop table if exists equipo;
+drop table if exists pertenece;
+
 create table ciclista(
 	ficha integer not null,
-	fecha_nacimiento date not null,
+	fecha_nac date not null,
 	nombre varchar(50) not null,
 	pais varchar(30) default 'ESPAÑA' not null,
 	anyo_retiro integer,
-	anyo_prof integer,
+	anyo_prof integer not null,
 	constraint p_ciclista
 	primary key (ficha),
 	constraint anyo_ciclistas
@@ -16,7 +20,7 @@ create table ciclista(
 
 create table equipo (
 	nombre varchar(50) not null,
-	anyo_apar integer,
+	anyo_apar integer not null,
 	anyo_des integer,
 	constraint p_pertenece
 	primary key (nombre)
@@ -34,8 +38,8 @@ create table pertenece(
 	references equipo(nombre),
 	constraint p_equipo
 	primary key (anyo, ficha, nombre)
-	);
 );
+
 
 INSERT INTO ciclista (ficha,fecha_nac,nombre)
 	VALUES (1,'2001-10-02','Pepe');
@@ -43,12 +47,12 @@ INSERT INTO ciclista (ficha,fecha_nac,nombre,anyo_retiro,anyo_prof)
 	VALUES (2,'2000-01-12','Juana',2019,2018);
 INSERT INTO ciclista (ficha,fecha_nac,nombre,pais,anyo_retiro,anyo_prof)
 	VALUES (3,'1999-03-22','Juan','Italia',NULL,2020);
-INSERT INTO ciclista (ficha,fecha_nac,nombre,pais,anyo_retiro,anyo_prof)
+INSERT INTO ciclista (ficha,fecha_nac,nombre,pais,anyo_retiro,anyo_prof, pertenece)
 	VALUES (4,'1999-03-22','Juan','Italia',NULL,2020, 2018);
 INSERT INTO equipo (nombre,anyo_apar)
 	VALUES ('Itinere',2022);
 INSERT INTO ciclista (ficha,fecha_nac,nombre,pais,anyo_retiro,anyo_prof, equipo)
-	VALUES (5,'1999-03-22','Juan','Italia',NULL,2020, 'Itinere');
+	VALUES (5,'1999-03-22','Juan','Italia',NULL,2020, 2018, 'Itinere');
 INSERT INTO equipo (nombre,anyo_apar,anyo_des)
 	VALUES ('Encuentro',2018,2021);
 INSERT INTO equipo (nombre,anyo_apar)
@@ -69,7 +73,7 @@ INSERT INTO pertenece (ficha,nombre,anyo)
 	VALUES (3,'Itinere',2022);
 INSERT INTO pertenece (ficha,nombre,anyo)
 	VALUES (3,'Itinere',2022);
-INSERT INTO ciclista (ficha,fecha_nac,nombre,pais,anyo_retiro,anyo_prof)
+INSERT INTO ciclista (ficha,fecha_nac,nombre,pais,anyo_retiro,anyo_prof, pertenece)
 	VALUES (6,'1999-03-22','Juan','Italia',NULL,2020, 2018);
 INSERT INTO ciclista (ficha,fecha_nac,nombre,pais,anyo_retiro,anyo_prof, equipo)
 	VALUES (7,'1999-03-22','Juan','Italia',NULL,2020, 'Itinere');
