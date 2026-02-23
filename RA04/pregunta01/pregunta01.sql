@@ -20,4 +20,52 @@ SELECT DEPARTMENT_ID, DEPARTMENT_NAME, EMPLOYEE_ID, HIRE_DATE, JOB_ID, SALARY, C
 rollback;
 
 
+begin;
+/*
+ * Ejercicio:
+La siguiente sentencia generará el error anterior, repárala para que la inserción se pueda completar sin error.
+
+INSERT INTO locations (LOCATION_ID, STREET_ADDRESS)
+VALUES (3300, 'C/Carlos III, 3', 'Cartagena');
+
+Añade lo mínimo necesario para que la sentencia se ejecute correctamente.*/
+select * from locations;
+INSERT INTO locations (LOCATION_ID, STREET_ADDRESS, CITY)
+VALUES (3300, 'C/Carlos III, 3', 'Cartagena');
+
+rollback;
+
+begin;
+/*
+ * Ejercicio:
+A la siguiente sentencia le falta algún atributo obligatorio
+
+INSERT INTO job_history(EMPLOYEE_ID, START_DATE, END_DATE, DEPARTMENT_ID)
+VALUES (120, CURRENT_DATE - 730, CURRENT_DATE, 20);
+Añade el atributo que falta para que la sentencia se 
+ejecute correctamente. El valor del atributo puede ser 
+cualquiera que cumpla con la restricción de integridad 
+establecida sobre ese atributo.*/
+
+select * from job_history jh;
+select * from jobs;
+INSERT INTO job_history(EMPLOYEE_ID, START_DATE, END_DATE, JOB_ID,DEPARTMENT_ID)
+VALUES (120, CURRENT_DATE - 730, CURRENT_DATE, 'SA_REP',20);
+
+rollback;
+/*
+ * Ejercicio
+Modifica el departamento cuyo nombre es 'IT' poniendo como nuevo 
+MANAGER_ID al empleado con identificador 104*/
+begin;
+select * from employees e;
+select * from departments d;
+
+update departments d
+set manager_id = 104
+where d.department_name = 'IT'
+
+rollback;
+
+
 
