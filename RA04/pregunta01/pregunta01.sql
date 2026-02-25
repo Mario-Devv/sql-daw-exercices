@@ -81,6 +81,10 @@ where department_id = 60;
 rollback;
 
 begin;
+/*
+ * Ejercicio
+Modifica el LAST_NAME del empleado que consta con el apellido 'Bull' por 'Toro'. 
+También deberá modificarse el EMAIL, cambiando de 'ABULL' a 'ATORO'.*/
 select * from employees;
 SELECT LAST_NAME, EMAIL FROM employees WHERE EMAIL BETWEEN 'A' AND 'B' ORDER BY EMAIL;
 
@@ -91,6 +95,115 @@ where last_name like '%Bull%'
 
 rollback;
 
+begin;
+/*
+ * Ejercicio
+Elimina todos los departamentos que 
+no tienen ningún MANAGER_ID asignado.*/
+select * from departments d;
 
+delete from departments
+where manager_id is null;
 
+SELECT * FROM DEPARTMENTS WHERE DEPARTMENT_ID BETWEEN 100 AND 150 ORDER BY DEPARTMENT_ID;
 
+rollback;
+
+begin;
+/*
+ * El empleado 114 ha cesado en su puesto, por lo 
+ * que todos aquellos que lo tenían como superior jerárquico, 
+ * se quedan sin ninún superior jerárquico hasta que se 
+ * les asigne uno.
+
+Por lo tanto, elimina el valor del atributo MANAGER_ID 
+de aquellos que tuvieran como superior 
+jerárquico al empleado 114.
+*/
+select * from employees
+where employee_id = 114;
+
+select * from employees 
+where manager_id = 100;
+
+update employees 
+set manager_id = null
+where manager_id = 114;
+
+SELECT * FROM employees WHERE EMPLOYEE_ID BETWEEN 114 AND 120 ORDER BY LAST_NAME;
+
+rollback;
+
+begin;
+/*
+ * Ejercicio
+Elimina el trabajo 'ST_MAN'. En el caso de que exista 
+algún empleado que actualmente esté realizando ese 
+trabajo o que, según la tabla job_history, lo 
+haya realizado en alguna ocasión, asígnale previamente 
+el trabajo con 'ST_CLERK'.
+*/
+select * from jobs j;
+select * from employees
+where job_id = 'ST_CLERK'
+;
+
+delete from jobs
+where job_id = 'ST_MAN';
+
+update employees
+set job_id = 'ST_CLERK'
+where job_id = 'ST_MAN'
+
+rollback;
+
+begin;
+/*
+ * Ejercicio
+Vamos a crear departamentos diferentes para los gestores. Para ello, insertaremos, en la tabla departments, 
+un registro por cada uno de los tipos de trabajo cuyo identificador finalice por '_MAN', con los siguientes datos:
+
+DEPARTMENT_ID: el que resulta de incrementar en 300 el DEPARTMENT_ID del empleado que se va a nombrar como manager del departamento.
+DEPARTMENT_NAME: el JOB_TITLE del tipo de trabajo que se está insertando.
+MANAGER_ID: el menor identificador de empleado de entre los que tienen el tipo de trabajo que se está insertando.
+LOCATION_ID: el valor constante 1700
+ * */
+select * from departments;
+select * from employees;
+select * from jobs; 
+
+insert into departments (department_id, department_name, manager_id, location_id)
+select e.department_id + 300, j.job_title, min(e.employee_id), 1700
+from employees e 
+join jobs j on j.job_id = e.job_id
+where j.job_id like '%_MAN'
+group by e.department_id, j.job_title 
+;
+
+select * from departments;
+
+rollback;
+
+begin;
+
+insert into employees(employee_id, first_name, last_name, email, hire_date, job_id, salary, department_id, commission_pct, manager_id)
+values(
+	220,
+	'Bustamante',
+	'Lopez',
+	'bustaquinqui@quinqui.com',
+	current_date + interval '0 hours',
+	(select job_id from jobs where job_id = 'IT_PROG'),
+	(select min_salary from jobs where job_id = 'IT_PROG'),
+	(select department_id from departments where department_name = 'IT'),
+	(select max(commission_pct) from employees),
+	(select manager_id from departments where department_name  = 'IT')
+);
+
+SELECT DEPARTMENT_ID, DEPARTMENT_NAME, EMPLOYEE_ID, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, EMPLOYEES.MANAGER_ID
+FROM DEPARTMENTS JOIN EMPLOYEES USING (DEPARTMENT_ID)
+WHERE EMPLOYEES.MANAGER_ID = 103;
+
+rollback;
+
+select * from employees e;
