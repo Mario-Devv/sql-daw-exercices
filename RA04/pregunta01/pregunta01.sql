@@ -67,5 +67,30 @@ where d.department_name = 'IT'
 
 rollback;
 
+begin;
+/*
+ *Ejercicio
+Utiliza la aritmética de fechas para actualizar las fechas de contratación (HIRE_DATE)  
+de los empleados del departamento cuyo identificador es 60, incrementándolas en un intervalo de 12 años. */
+select * from employees e ;
+
+update employees
+set hire_date = hire_date + interval '12 years'
+where department_id = 60;
+
+rollback;
+
+begin;
+select * from employees;
+SELECT LAST_NAME, EMAIL FROM employees WHERE EMAIL BETWEEN 'A' AND 'B' ORDER BY EMAIL;
+
+update employees
+set last_name = 'Toro',
+ email = 'ATORO'
+where last_name like '%Bull%'
+
+rollback;
+
+
 
 
