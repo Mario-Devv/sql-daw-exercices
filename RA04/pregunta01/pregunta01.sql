@@ -206,4 +206,125 @@ WHERE EMPLOYEES.MANAGER_ID = 103;
 
 rollback;
 
-select * from employees e;
+begin;
+/*
+ * Ejercicio
+Se debe trasladar el departamento cuyo nombre es 'IT' a la única dirección que consta en China
+*/
+
+/*select * from departments;
+select* from countries;
+select * from locations l;*/
+
+
+update departments
+set location_id = (select l.location_id from locations l  join countries c on l.country_id  = c.country_id
+where c.country_name = 'China'
+)where department_name = 'IT';
+
+SELECT * FROM departments WHERE DEPARTMENT_ID BETWEEN 40 AND 70 ORDER BY DEPARTMENT_ID;
+
+rollback;
+
+begin;
+/*
+  
+ * Ejercicio
+Alexander Hunold se va a jubilar, por lo que se nombrará, 
+como jefe de su departamento, al subordinado directo de éste que mayor antigüedad tenga en la empresa.*/
+
+update departments
+set manager_id = (select employee_id from employees where 
+				  job_id = 'IT_PROG' and 
+				  not employee_id = 103 
+				  order by hire_date limit 1
+		)
+where department_name = 'IT'
+;
+
+SELECT * FROM departments WHERE MANAGER_ID IS NOT NULL ORDER BY DEPARTMENT_ID;
+
+
+rollback;
+
+begin;
+/*
+ * 
+Ejercicio
+Elimina todos los departamentos en los que no hay asignado ningún empleado.
+
+Nota: Debes tener en cuenta los posibles valores NULL.*/
+
+select * from departments;
+select * from employees;
+
+select * from departments d 
+where d.department_id not in(
+	select e.department_id  from employees e
+	where e.department_id is not null
+	);
+
+delete from departments
+where department_id not in(
+	select department_id from employees
+	where department_id is not null 
+);
+
+SELECT DEPARTMENT_ID FROM departments ORDER BY DEPARTMENT_ID;
+
+rollback;
+
+begin;
+
+select * from departments d ;
+select *from employees where hire_date <= current_date - interval  '30 years';
+SELECT * FROM employees WHERE manager_id IS NOT NULL;
+
+update departments
+set manager_id = null
+where manager_id in (
+select employee_id from employees
+where hire_date <= current_date - interval '30 years'
+);
+
+update employees
+set manager_id = null
+where manager_id in (
+	select employee_id from employees
+	where hire_date <= current_date -interval '30 years'
+);
+
+
+delete from job_history
+where employee_id in (select employee_id from employees
+where hire_date <= current_date - interval '30 years'
+);
+
+delete from employees
+where hire_date <=current_date -interval '30 years';
+
+SELECT EMPLOYEE_ID, 'old' AS origin FROM EMPLOYEES WHERE EXTRACT(year FROM AGE(CURRENT_DATE, HIRE_DATE)) >= 28
+
+UNION
+
+SELECT MANAGER_ID, 'departments' FROM DEPARTMENTS WHERE MANAGER_ID IS NOT NULL
+
+UNION
+
+SELECT EMPLOYEE_ID, 'job_history' FROM JOB_HISTORY
+
+UNION
+
+SELECT DISTINCT MANAGER_ID, 'managers' FROM EMPLOYEES ORDER BY origin, employee_id;
+
+
+rollback;
+
+
+
+
+
+
+
+
+
