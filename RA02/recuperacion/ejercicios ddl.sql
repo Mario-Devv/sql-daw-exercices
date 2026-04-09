@@ -93,7 +93,7 @@ create table ejemplo4(
 rollback;
 
 begin;
-
+/*5. Borra la tabla PROVINCIAS. ¿Qué sucede?*/
 create table provincias (
 	cod_provincia numeric(5),
 	nombre_provincia varchar(20),
@@ -105,9 +105,9 @@ create table personas (
 	dni char(10) not null,
 	nombre varchar(15),
 	direccion varchar(20),
-	poblacion varchar(15),
 	cod_provincia numeric(5),
 	
+	poblacion varchar(15),
 	constraint pk_personas
 	primary key(dni),
 	
@@ -118,3 +118,30 @@ create table personas (
 drop table provincias;
 
 rollback;
+
+begin;
+create table fabricantes(
+	cod_fabricante numeric(3),
+	nombre varchar(15),
+	pais varchar(15),
+	
+	constraint pk_fabricantes
+	primary key (cod_fabricante),
+	
+	constraint onlyMayus
+);
+
+create table articulos(
+	articulos varchar(20),
+	cod_fabricante numeric(3),
+	peso numeric(3),
+	categoria varchar(10),
+	precio_venta numeric(6,2),
+	precio_costo numeric(6,2),
+	existencias numeric(5)
+	)
+
+
+
+rollback;
+
