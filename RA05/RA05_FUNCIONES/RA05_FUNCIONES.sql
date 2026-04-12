@@ -39,4 +39,49 @@ begin
 	where department_id = 90;
 end;$$;
 
-select * from get_empleados_count();
+
+/*Ejercicio
+Habiendo creado correctamente la función get_empleados_count(), ¿cómo mostrarías el número de empleados asociado a cada department_id?
+
+Ordena el resultado descendentemente por el número de empleados.*/
+select department_id, get_empleados_count(department_id) as "n_empleados"
+from employees e 
+group by department_id
+order by count(get_empleados_count(department_id)) desc;
+
+
+/*Ejercicio
+Utilizando la base de datos HR, crea la función antiguedada la que le enviamos un nombre y unos apellidos y nos devuelve los años de antigüedad que ese empleado lleva en la empresa
+
+Para resolver esa función, deberás utilizar las funciones EXTRACT() y AGE() cuyas referencias puedes encontrar aquí*/
+select extract(year from age(hire_date)) from employees;
+create or replace function antiguedad(
+	nombre varchar,
+	apellidos varchar
+)
+returns integer
+language plpgsql
+as $$
+declare
+	obtenerAntiguedad integer;
+begin
+	select extract(year from age(hire_date))
+	into obtenerAntiguedad
+	from employees
+	where nombre = first_name and apellidos = last_name
+	;
+return obtenerAntiguedad; 
+end;$$;
+
+select e.first_name, e.last_name, antiguedad(e.first_name, e.last_name) from employees e;
+
+select department_id, get_empleados_count(department_id) as "n_empleados"
+from employees e 
+group by department_id
+order by count(get_empleados_count(department_id)) desc;
+
+
+
+SELECT department_id, get_empleados_count(department_id) as n_empleados FROM EMPLOYEES E
+GROUP BY department_id
+ORDER BY n_empleados DESC;
