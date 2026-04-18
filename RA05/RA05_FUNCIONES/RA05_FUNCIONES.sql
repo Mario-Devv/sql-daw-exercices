@@ -85,3 +85,84 @@ order by count(get_empleados_count(department_id)) desc;
 SELECT department_id, get_empleados_count(department_id) as n_empleados FROM EMPLOYEES E
 GROUP BY department_id
 ORDER BY n_empleados DESC;
+
+select * from employees;
+drop function get_subordinados_departamento(numeric)
+
+/*Crea la función get_subordinados_departamento(), que recibe, como parámetro, un identificador de departamento y devuelve el número de subordinados que hay en ese departamento. Es decir:
+
+Si el departamento no tiene ningún empleado asociado, la función devolverá el texto 'Sin empleados'.
+Si el departamento únicamente tiene un empleado asociado, ese tendrá que ser el jefe, por lo que la función devolverá el texto 'Solo el jefe'.
+Si el departamento tiene más de un empleado asociado, la función devolvera la cantidad de empleados asociados a la que se le descontará el jefe.
+*/
+
+create or replace function get_subordinados_departamento(
+	id_departamento numeric 
+)
+returns text
+language plpgsql
+as $$
+declare
+	numero_subordinados integer;
+begin
+	select count(*) into numero_subordinados
+	from employees
+	where department_id = id_departamento;
+
+	if numero_subordinados = 0 then
+		return 'Sin empleados';
+	elseif numero_subordinados = 1 then
+		return 'Solo el jefe';
+	else
+		return (numero_subordinados - 1)::text;
+	end if;
+
+end;
+$$;
+select department_name,  get_subordinados_departamento(department_id)
+from departments
+order by department_name;
+
+/*Crea la función sustituto_por_antiguedad, a la que le enviamos como parámetro un identificador de un departamento y busca al empleado de más antigüedad,  en ese departamento, que no es, a su vez, jefe del departamento
+
+Como valor de retorno, debe devolver la concatenación del identificador de empleado con el apellido y el nombre de dicho empleado.
+
+En el caso de que no haya ningún otro empleado en el departamto distinto al jefe, la función deberá devolver el texto 'Sin sustituto'*/
+create or replace function sustituto_por_antiguedad(
+id_departamento numeric)
+returns text
+language plpgsql
+as $$
+declare
+	v_sustituto_por_antiguedad text;
+begin
+	select e.employee_id ||' - '||e.last_name|| ', '||	e.first_name
+	into v_sustituto_por_antiguedad
+	from employees e
+	join departments d on d.department_id = e.department_id
+	where e.employee_id not in (
+		select d2.manager_id from departments d2
+		where d2.department_id = id_departamento) 
+	and e.hire_date in(
+		select min(e2.hire_date) from employees e2
+		where e2.department_id = id_departamento
+		and e2.employee_id not in(
+			select d3.manager_id from departments d3
+			where d3.department_id = id_departamento
+		)
+	)
+	and e.department_id = id_departamento;
+
+	if v_sustituto_por_antiguedad is null then
+	return 'Sin sustituto';
+	else
+	return v_sustituto_por_antiguedad;
+	end if;
+end;
+$$;
+
+select department_id, department_name,  sustituto_por_antiguedad(department_id)
+from departments
+where department_id < 120
+order by department_name;
+
