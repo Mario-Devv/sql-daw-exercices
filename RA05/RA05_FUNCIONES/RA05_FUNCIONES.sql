@@ -123,29 +123,11 @@ select department_name,  get_subordinados_departamento(department_id)
 from departments
 order by department_name;
 
+/*Crea la función sustituto_por_antiguedad, a la que le enviamos como parámetro un identificador de un departamento y busca al empleado de más antigüedad,  en ese departamento, que no es, a su vez, jefe del departamento
 
-select d.department_id,
-e.first_name,
-d.department_name, 
-max(extract('YEAR' from age(e.hire_date)))
-from employees e
-join departments d on d.department_id = e.department_id
-where e.employee_id not in (
-select manager_id from departments 
-where department_id = e.department_id)
-group by d.department_id, d.department_name, e.first_name, e.hire_date
-having extract('YEAR' from e.hire_date) > max(extract('YEAR' from age(e.hire_date)))
-order by d.department_name;
+Como valor de retorno, debe devolver la concatenación del identificador de empleado con el apellido y el nombre de dicho empleado.
 
-
-
-select *
-from departments;
-
-select *
-from employees;
-
-DROP FUNCTION sustituto_por_antiguedad(numeric);
+En el caso de que no haya ningún otro empleado en el departamto distinto al jefe, la función deberá devolver el texto 'Sin sustituto'*/
 create or replace function sustituto_por_antiguedad(
 id_departamento numeric)
 returns text
