@@ -166,3 +166,41 @@ from departments
 where department_id < 120
 order by department_name;
 
+select *
+from jugadores 
+;
+
+select * from juegos;
+
+select  * from partidas;
+
+select ju.jugador_id ,ju.nombre as "nombre jugador",
+count(p.partida_id)
+from jugadores ju
+join partidas p on ju.jugador_id = p.jugador_id
+join juegos je on p.juego_id = je.juego_id
+group by ju.jugador_id ;
+
+create or replace function obtener_datos_jugador (id_jugador int)
+returns text
+language plpgsql
+as $$
+declare
+	v_jugador text;
+begin
+	select je.nombre|| ', '|| count(p.partida_id)
+	into v_jugador
+	from jugadores ju
+	join partidas p on id_jugador = p.jugador_id
+	join juegos je on p.juego_id = je.juego_id
+	where ju.jugador_id = id_jugador
+	group by id_jugador, je.nombre;	
+
+	return v_jugador;
+end;
+$$;
+
+select jugador_id, obtener_datos_jugador(jugador_id)
+from jugadores 
+group by jugador_id 
+order by jugador_id
